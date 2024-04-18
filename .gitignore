@@ -1,0 +1,8 @@
+checkpoints/
+data/
+exp_record/
+/exp_record*/
+results/
+/results*/
+**/__pycache__
+__pycache__/
