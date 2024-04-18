@@ -140,7 +140,7 @@ class SamplingStrategy:
 		tgts_logits, tgts_lab, tgts_preds, tgts_emb = utils.get_embedding(self.model, tgts_loader, self.device, self.num_classes, \
 																	   self.args, with_emb=True, emb_dim=emb_dim)															   
 		
-		idxs_unlabeled = np.arange(len(self.train_idx))[~self.idxs_lb]  #长度为所有unlabel的target trainset的长度
+		idxs_unlabeled = np.arange(len(self.train_idx))[~self.idxs_lb]  
 		tgtuns_sampler = ActualSequentialSampler(self.train_idx[idxs_unlabeled])
 		tgtuns_loader = torch.utils.data.DataLoader(self.dset, sampler=tgtuns_sampler, num_workers=self.args.num_workers, \
 												  batch_size=self.args.batch_size, drop_last=False)
@@ -209,8 +209,8 @@ class GMM(SamplingStrategy):
 		loss_lab, s_time = [], time()
 
 		ST_y = src_lab
-		UST_logits = torch.cat([tgtuns_logits, src_logits], dim=0)   # 是logits
-		UST_plab = torch.cat([tgtuns_preds, src_preds])  # tgtuns src都是预测的类别伪标签
+		UST_logits = torch.cat([tgtuns_logits, src_logits], dim=0)   
+		UST_plab = torch.cat([tgtuns_preds, src_preds])  
 		UST_label = torch.cat([tgtuns_preds, src_lab], dim=0)  
 		tgts_lab, tgts_pen_emb = [], []
 		if self.query_count > 1:
@@ -221,15 +221,15 @@ class GMM(SamplingStrategy):
 			tgts_logits, tgts_lab, tgts_preds, tgts_pen_emb = utils.get_embedding(self.model, tgts_loader, self.device, self.num_classes, \
 																		self.args, with_emb=True, emb_dim=emb_dim)
 
-			ST_y = torch.cat([ST_y, tgts_lab], dim=0) #.cpu().numpy()  # Ground truth of src+stgt 
+			ST_y = torch.cat([ST_y, tgts_lab], dim=0)  # Ground truth of src+stgt 
 			UST_logits = torch.cat([UST_logits, tgts_logits], dim=0)  # tgtuns + src + tgts 's logits 
-			UST_plab = torch.cat([UST_plab, tgts_preds]) # .cpu().numpy() 
+			UST_plab = torch.cat([UST_plab, tgts_preds]) 
 			UST_label = torch.cat([UST_label, tgts_lab], dim=0) 
 
 		ST_y = ST_y.cpu().numpy()
 		UST_plab = UST_plab.cpu().numpy() 
 
-		UST_y = np.concatenate([-1*np.ones(len(idxs_unlabeled)), ST_y])  # unlabel没有标签 -1,  query用真标
+		UST_y = np.concatenate([-1*np.ones(len(idxs_unlabeled)), ST_y])
 		UST_prob = F.softmax(UST_logits, dim=1)  # N,C 
 		UST_conf = UST_prob.max(dim=1)[0].cpu().numpy()  # unlab_lab_confidence
 		conf_index = np.where(UST_conf > self.args.sele_conf_thred)[0]   # model_conf > \tau  conf_index

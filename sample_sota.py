@@ -39,10 +39,7 @@ def register_strategy(name):
 
 def get_sota_strategy(sample, *args):
 	if sample not in al_dict: raise NotImplementedError
-	try:
-		return al_dict[sample](*args)
-	except:
-		set_trace()
+	return al_dict[sample](*args)
 
 @register_strategy('uniform')
 class RandomSampling(SamplingStrategy):
@@ -55,13 +52,13 @@ class RandomSampling(SamplingStrategy):
 
 	def query(self, n):
 		self.query_count += 1
-
+        
 		idxs_unlabeled = np.arange(len(self.train_idx))[~self.idxs_lb]  # The length is the length of all unlabeled target trainsets
 		idx_in_unstgt = np.random.choice(np.arange(len(idxs_unlabeled)), n, replace=False)
 
 		selected_idxs = idxs_unlabeled[idx_in_unstgt]
 		return selected_idxs
-
+        
 
 @register_strategy('entropy')
 class EntropySampling(SamplingStrategy):
@@ -72,7 +69,7 @@ class EntropySampling(SamplingStrategy):
 	def query(self, n):
 		self.query_count += 1
 
-		idxs_unlabeled = np.arange(len(self.train_idx))[~self.idxs_lb]  #长度为所有unlabel的target trainset的长度
+		idxs_unlabeled = np.arange(len(self.train_idx))[~self.idxs_lb]  
 		tgtuns_sampler = ActualSequentialSampler(self.train_idx[idxs_unlabeled])
 		tgtuns_loader = torch.utils.data.DataLoader(self.dset, sampler=tgtuns_sampler, num_workers=4, \
 												batch_size=self.args.batch_size, drop_last=False)

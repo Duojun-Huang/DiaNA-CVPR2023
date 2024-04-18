@@ -89,7 +89,7 @@ def main():
 
 	domains = args.domains.split(',')
 	print(domains)
-	# set_trace()
+	
 	for domain in domains:
 		print('Processing {}...'.format(domain))		
 		train_file = os.path.join(args.input_dir, '{}_train.txt'.format(domain))

@@ -175,7 +175,7 @@ class RandAugmentMC(object):
             v = np.random.randint(1, self.m)
             if random.random() < 0.5:
                 img = op(img, v=v, max_v=max_v, bias=bias)
-        img = CutoutAbs(img, int(self.size* self.abs_size_rate))   # self.abs_size_rate  0.5
+        img = CutoutAbs(img, int(self.size* self.abs_size_rate)) 
         return img
 
 

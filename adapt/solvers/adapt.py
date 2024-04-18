@@ -67,33 +67,6 @@ class TargetFTSolver(BaseSolver):
 		if epoch % 10 == 0: print(info_str)
 		return round_iter
 
-	def solve_sum(self, epoch, writer, round_iter, iter_num):
-		"""
-		Finetune on target labels
-		"""		
-		self.net.train()		
-		src_weight = self.args.src_weight
-		if len(self.src_loader.sampler) == 0 or len(self.tgt_sup_loader.sampler) == 0 :
-			set_trace()
-		lab_iter_list = { 'Src': iter(self.src_loader), 'TargetSup': iter(self.tgt_sup_loader)	}
-		lab_w_list = { 'Src': self.args.src_weight, 'TargetSup': 1.0 }
-		for part, lab_iter in lab_iter_list.items():
-			for sup_data, sup_label in lab_iter:
-				info_str = '[Train target finetuning srcw:{} supw:1.0] Epoch: {}'.format(src_weight, epoch)
-				round_iter += 1
-				self.tgt_opt.zero_grad()
-				sup_data, sup_label = sup_data.to(self.device), sup_label.to(self.device)
-				out = self.net(sup_data)
-				sup_loss =  nn.CrossEntropyLoss()(out, sup_label)
-				
-				total_loss = lab_w_list[part] * sup_loss
-				total_loss.backward()
-				self.tgt_opt.step()
-				if self.run == 0:  #5 for domainnet
-					writer.add_scalar('Run0/QueryCount-{}/Finetune{}Loss'.format(self.query_count, part), sup_loss.item(), round_iter)
-				# if epoch % 10 == 0: print(info_str)
-		return round_iter
-
 @register_solver('self_ft')
 class SelfFTSolver(BaseSolver):
 	"""

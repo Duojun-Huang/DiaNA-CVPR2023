@@ -54,7 +54,7 @@ def run_active_adaptation(args, source_model, src_dset, num_classes, device, wri
 	transfer_perf, transfer_perf_topk = utils.test(source_model, device, target_test_loader, topk=1) 
 	out_str = '{}->{} performance (Before {}): Task={:.2f}  Topk Acc={:.2f}'.format(args.source, args.target, args.warm_strat, transfer_perf, transfer_perf_topk)
 	print(out_str)
-	# set_trace()
+	
 
 	print('------------------------------------------------------\n')
 	print('Running strategy: Init={}, AL={}, Pretrain={}'.format(args.model_init, args.al_strat, args.warm_strat))
@@ -131,7 +131,7 @@ def run_active_adaptation(args, source_model, src_dset, num_classes, device, wri
 			idxs_lb[idxs] = True
 			sampling_strategy.update(idxs_lb)  # update sampling_strategy.idxs_lb = idxs_lb
 			if args.shuffle_src:
-				src_train_loader, _, _, _ = src_dset.get_loaders(num_workers=args.num_workers) # shffule
+				src_train_loader, _, _, _ = src_dset.get_loaders(num_workers=args.num_workers) 
 
 			# Update model with new data via DA strategy
 			round_train_start = time.time()	
@@ -206,18 +206,10 @@ def main():
 	parser.add_argument('--k_feat', type=int, help='k in top-k similarity')
 	parser.add_argument('--run_one', type=bool, default=True)  # one random run only
 	
-	#for self train
-	# parser.add_argument('--src_weight', type=float, default=0.1)
-	# parser.add_argument('--cc_weight', type=float, default=0.5)
-	# parser.add_argument('--uc_weight', type=float, default=0.1)
-	# parser.add_argument('--sele_conf_thred', type=float, default=0.95)  #GMM对于label set打标签阶段的取的select_index_assitItem的阈值
-	
 	#for active learning
 	parser.add_argument('--round_type', type=str, default='multi-round')
 	parser.add_argument('--total_budget', type=float)
 	parser.add_argument('--num_rounds', type=int)
-
-	#for DiaNA sampling
 
 	#for training model on source domain
 	parser.add_argument('--cnn', type=str)
@@ -260,7 +252,7 @@ def main():
 	# Record
 	writer, exp_path = utils.gen_dir(args)
 	print("current exp_path: \t", exp_path)
-	# set_trace()
+	
 
 	# Load source data
 	src_dset = ASDADataset(args.dataset, args.source, "source", batch_size=args.batch_size) 
@@ -293,7 +285,6 @@ def main():
 					best_val_acc = val_acc
 					best_source_model = copy.deepcopy(source_model)
 					torch.save(best_source_model.state_dict(), os.path.join('checkpoints', 'source', args.dataset, source_file))
-		set_trace()
 
 	best_source_model = torch.nn.DataParallel(best_source_model, device_ids=list(range(torch.cuda.device_count())))
 

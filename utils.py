@@ -137,7 +137,6 @@ def get_embedding(model, loader, device, num_classes, args, with_emb=False, emb_
 					e1, e2 = model(data, with_emb=True)
 				except StopIteration:
 					print("data.shape model.device",data.shape)
-					set_trace()
 				embedding_pen[batch_idx*batch_sz:batch_idx*batch_sz + min(batch_sz, e2.shape[0]), :] = e2.cpu()
 			else:
 				e1 = model(data, with_emb=False)
